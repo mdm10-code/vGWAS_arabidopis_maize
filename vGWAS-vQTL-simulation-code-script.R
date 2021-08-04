@@ -333,7 +333,7 @@ rows_for_snps_atfull_molike <- 20662
 
 at_vpheno_molike_MAF40_500 <- vQTL(
   wd = wd$at_vQTL_simulations,
-  Dir = "At_vmolike_MAF40_sub500", 
+  Dir = "At_vmolike_MAF40_500", 
   Geno = at_geno_numeric_500_plusone, 
   SP_obj = scaled_sp_at_molike_wMQTL_500,
   vQTN_sel = "defined",
@@ -401,8 +401,8 @@ at_vpheno_molike_womQTL_MAF40_full <- vQTL(
 
 #oillike setting without mQTLs MAF10
 ##500 diversity panel
-at_vpheno_oil_500_womQTL_MAF10 <- vQTL(wd = wd$at_vQTL_simulations,
-  Dir = "at_voillike_500_womQTL_MAF10", 
+at_vpheno_oil_womQTL_MAF10_500 <- vQTL(wd = wd$at_vQTL_simulations,
+  Dir = "at_voillike_womQTL_MAF10_500", 
   Geno = at_geno_numeric_500_plusone, 
   SP_obj = NULL,
   vQTN_sel = "defined",
@@ -417,8 +417,8 @@ at_vpheno_oil_500_womQTL_MAF10 <- vQTL(wd = wd$at_vQTL_simulations,
   reps = 100)
 
 ##full diversity panel
-at_vpheno_oil_full_womQTL_MAF10 <- vQTL(wd = wd$at_vQTL_simulations,
-  Dir = "at_voillike_full_womQTL_MAF10", 
+at_vpheno_oil_womQTL_MAF10_full <- vQTL(wd = wd$at_vQTL_simulations,
+  Dir = "at_voillike_womQTL_MAF10_full", 
   Geno = at_geno_numeric_full_plusone, 
   SP_obj = NULL,
   vQTN_sel = "defined",
@@ -434,8 +434,8 @@ at_vpheno_oil_full_womQTL_MAF10 <- vQTL(wd = wd$at_vQTL_simulations,
 
 #Oillike setting with vQTNs of MAF40
 ##500 diversity panel
-at_vpheno_oil_500_womQTL_MAF40 <- vQTL(wd = wd$at_vQTL_simulations,
-  Dir = "at_voillike_500_womQTL_MAF40", 
+at_vpheno_oil_womQTL_MAF40_500 <- vQTL(wd = wd$at_vQTL_simulations,
+  Dir = "at_voillike_womQTL_MAF40_500", 
   Geno = at_geno_numeric_500_plusone, 
   SP_obj = NULL,
   vQTN_sel = "defined",
@@ -450,8 +450,8 @@ at_vpheno_oil_500_womQTL_MAF40 <- vQTL(wd = wd$at_vQTL_simulations,
   reps = 100)
 
 ##full diversity panel
-at_vpheno_oil_full_womQTL_MAF40 <- vQTL(wd = wd$at_vQTL_simulations,
-  Dir = "at_voillike_full_womQTL_MAF40", 
+at_vpheno_oil_womQTL_MAF40_full <- vQTL(wd = wd$at_vQTL_simulations,
+  Dir = "at_voillike_womQTL_MAF40_full", 
   Geno = at_geno_numeric_full_plusone, 
   SP_obj = NULL,
   vQTN_sel = "defined",
@@ -509,7 +509,7 @@ zm_vPheno_molike_MAF40_full <- vQTL(
 ##500 diversity panel
 zm_vpheno_molike_womQTL_MAF40_500 <- vQTL(
   wd = wd$zm_vQTL_simulations,
-  Dir = "zm_vmolike_womQTL_MAF40_sub500", 
+  Dir = "zm_vmolike_womQTL_MAF40_500", 
   Geno = zm_geno_numeric_500_plusone, 
   SP_obj = NULL,
   vQTN_sel = "defined",
@@ -543,8 +543,8 @@ zm_vpheno_molike_womQTL_MAF40_full <- vQTL(
 #maize
 ##MAF10
 ###Sub500
-zm_vpheno_oil_500_womQTL_MAF10 <- vQTL(wd = wd$zm_vQTL_simulations,
-  Dir = "zm_voillike_500_womQTL_MAF10", 
+zm_vpheno_oil_womQTL_MAF10_500 <- vQTL(wd = wd$zm_vQTL_simulations,
+  Dir = "zm_voillike_womQTL_MAF10_500", 
   Geno = zm_geno_numeric_500_plusone, 
   SP_obj = NULL,
   vQTN_sel = "defined",
@@ -559,8 +559,8 @@ zm_vpheno_oil_500_womQTL_MAF10 <- vQTL(wd = wd$zm_vQTL_simulations,
   reps = 100)
 
 ###FULL
-zm_vpheno_oil_full_womQTL_MAF10 <- vQTL(wd = wd$zm_vQTL_simulations,
-  Dir = "zm_voillike_full_womQTL_MAF10", 
+zm_vpheno_oil_womQTL_MAF10_full <- vQTL(wd = wd$zm_vQTL_simulations,
+  Dir = "zm_voillike_womQTL_MAF10_full", 
   Geno = zm_geno_numeric_full_plusone, 
   SP_obj = NULL,
   vQTN_sel = "defined",
@@ -575,8 +575,8 @@ zm_vpheno_oil_full_womQTL_MAF10 <- vQTL(wd = wd$zm_vQTL_simulations,
   reps = 100)
 
 #oillike settings with MAF40
-zm_vpheno_oil_500_womQTL_MAF40 <- vQTL(wd = wd$zm_vQTL_simulations,
-  Dir = "zm_voillike_500_womQTL_MAF40", 
+zm_vpheno_oil_womQTL_MAF40_500 <- vQTL(wd = wd$zm_vQTL_simulations,
+  Dir = "zm_voillike_womQTL_MAF40_500", 
   Geno = zm_geno_numeric_500_plusone, 
   SP_obj = NULL,
   vQTN_sel = "defined",
@@ -591,8 +591,8 @@ zm_vpheno_oil_500_womQTL_MAF40 <- vQTL(wd = wd$zm_vQTL_simulations,
   reps = 100)
 
 #full diversity panel
-zm_vpheno_oil_full_womQTL_MAF40 <- vQTL(wd = wd$zm_vQTL_simulations,
-  Dir = "zm_voillike_full_womQTL_MAF40", 
+zm_vpheno_oil_womQTL_MAF40_full <- vQTL(wd = wd$zm_vQTL_simulations,
+  Dir = "zm_voillike_womQTL_MAF40_full", 
   Geno = zm_geno_numeric_full_plusone, 
   SP_obj = NULL,
   vQTN_sel = "defined",

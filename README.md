@@ -7,7 +7,10 @@ The following is an outline/order of the scripts used for this publication with 
 
 2.) vGWAS-vQTL-simulation-code-script.R : This script was used to simulate the variance genetic architectures
 
-3.) 
+3.) vGWAS-Brown Forsythe Test Script.R : This script was used to run the Brown-Forsythe Test (BFT) on the different settings
+
 4.)
+
 5.)
+
 6.) 

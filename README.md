@@ -6,7 +6,9 @@ The following is an outline/order of the scripts used for this publication with 
 1.) additive-effects-simplePHENOTYPES-script.R 
 This script was used to produce the null settings and additive effects for the Molydenum-like settings with additive effects
 
-2.)
+2.) vGWAS-vQTL-simulation-code-script.R
+This script was used to simulate the variance genetic architectures
+
 3.)
 4.)
 5.)

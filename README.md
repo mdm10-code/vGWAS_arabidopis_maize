@@ -11,7 +11,7 @@ The following is an outline/order of the scripts used for this publication with 
 
 4.) GAPIT-script.R : This script used GAPIT to produce principal components for the DGLM analyses
 
-5.)
+5.) DGLM-script.R : This script was used to run DGLM on the different settings
 
 6.) 
 

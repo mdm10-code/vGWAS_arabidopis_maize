@@ -7,6 +7,7 @@ The following is an outline/order of the scripts used for this publication with 
 
 2.) vGWAS-vQTL-simulation-code-script.R : This script was used to simulate the variance genetic architectures
 
-3.)
+3.) 
 4.)
 5.)
+6.) 

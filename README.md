@@ -13,6 +13,6 @@ The following is an outline/order of the scripts used for this publication with 
 
 5.) DGLM-script.R : This script was used to run DGLM on the different settings
 
-6.) 
+6.) Positive-detection-rate-script.R : 
 
 7.) 

@@ -9,8 +9,10 @@ The following is an outline/order of the scripts used for this publication with 
 
 3.) vGWAS-Brown Forsythe Test Script.R : This script was used to run the Brown-Forsythe Test (BFT) on the different settings
 
-4.)
+4.) GAPIT-script.R : This script used GAPIT to produce principal components for the DGLM analyses
 
 5.)
 
 6.) 
+
+7.) 

@@ -17,4 +17,6 @@ The following is an outline/order of the scripts used for this publication with 
 
 7.) vGWAS-visualization-script.R : This script was used to visualize the false and true-positive detection rates
 
-8.) Applied-vGWAS : This script was used to conduct BFT and DGLM on plant height residuals in maize
+8.) Applied-vGWAS-script.R : This script was used to conduct BFT and DGLM on plant height residuals in maize
+
+9.) Applied-vGWAS-Visuals-Script.R : This script was used to visualize the results from MLM, BFT, and DGLM for plant height in maize. 

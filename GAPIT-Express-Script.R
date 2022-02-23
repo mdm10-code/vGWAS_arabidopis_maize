@@ -506,3 +506,5 @@ GAPIT(
   SNP.effect = "Add",
   model = "MLM"
 )
+
+save.image("~/vGWAS_chaptI_RII.RData")

@@ -14,7 +14,6 @@ zm.pheno.FULL.listI <- list(sp.zm.null.full,
                             zm.vpheno.molike.MAF10.h233.vQTN90.FULL,
                             zm.vpheno.molike.MAF10.h263.vQTN10.FULL)
 
-
 names(zm.pheno.FULL.listI)[[1]] <- "sp.zm.null.full"
 names(zm.pheno.FULL.listI)[[2]] <- "sp.zm.GxE.FULL.mod"
 names(zm.pheno.FULL.listI)[[3]] <- "zm.vpheno.molike.MAF10.h233.vQTN10.FULL"
@@ -22,9 +21,23 @@ names(zm.pheno.FULL.listI)[[4]] <- "zm.vpheno.molike.MAF10.h233.vQTN50.FULL"
 names(zm.pheno.FULL.listI)[[5]] <- "zm.vpheno.molike.MAF10.h233.vQTN90.FULL"
 names(zm.pheno.FULL.listI)[[6]] <- "zm.vpheno.molike.MAF10.h263.vQTN10.FULL"
 
+#This is for list II
+zm.pheno.FULL.listII <- list(zm.vpheno.molike.MAF10.h263.vQTN50.FULL,
+                             zm.vpheno.molike.MAF10.h263.vQTN90.FULL,
+                             zm.vpheno.molike.MAF40.h233.vQTN10.FULL,
+                             zm.vpheno.molike.MAF40.h233.vQTN50.FULL,
+                             zm.vpheno.molike.MAF40.h233.vQTN90.FULL,
+                             zm.vpheno.molike.MAF40.h263.vQTN10.FULL)
 
-setwd("C:/Users/mdm10/Documents/PROJECTS/Dissertation/Chapter_one/RII/2_pipeline/BFT/Zm/FULL/")
-wd$zm_bft_FULL <- "C:/Users/mdm10/Documents/PROJECTS/Dissertation/Chapter_one/RII/2_pipeline/BFT/Zm/FULL/"
+names(zm.pheno.FULL.listII)[[1]] <- "zm.vpheno.molike.MAF10.h263.vQTN50.FULL"
+names(zm.pheno.FULL.listII)[[2]] <- "zm.vpheno.molike.MAF10.h263.vQTN90.FULL"
+names(zm.pheno.FULL.listII)[[3]] <- "zm.vpheno.molike.MAF40.h233.vQTN10.FULL"
+names(zm.pheno.FULL.listII)[[4]] <- "zm.vpheno.molike.MAF40.h233.vQTN50.FULL"
+names(zm.pheno.FULL.listII)[[5]] <- "zm.vpheno.molike.MAF40.h233.vQTN90.FULL"
+names(zm.pheno.FULL.listII)[[6]] <- "zm.vpheno.molike.MAF40.h263.vQTN10.FULL"
+
+setwd("C:/Users/mdm10/Documents/Projects/Dissertation/Chapter_one/RII/2_pipeline/out/vGWAS_chapter_one_zm/BFT/FULL/")
+wd$zm_bft_FULL <- "C:/Users/mdm10/Documents/Projects/Dissertation/Chapter_one/RII/2_pipeline/out/vGWAS_chapter_one_zm/BFT/FULL/"
 
 BFT.deluxe2 <- function(wd = NULL, trait_list = NULL, Geno = NULL, Map = NULL) {
   for(h in 1:length(trait_list)) {
@@ -55,3 +68,10 @@ BFT.deluxe2(wd = wd$zm_bft_FULL, trait_list = zm_bft_FULL_list, Geno = t(zm_just
 
 ##
 BFT.deluxe2(wd = wd$zm_bft_FULL, trait_list = zm.pheno.FULL.listI, Geno = t(zm.just.geno.full), Map = zm.map[, c(1, 3, 4)])
+
+##Trait list II
+BFT.deluxe2(wd = wd$zm_bft_FULL, trait_list = zm.pheno.FULL.listII, Geno = zm.just.geno.full, Map = zm.map[, c(1, 3, 4)])
+
+##Save workspaces
+save.image("vGWAS_chaptI_RII.RData")
+save.image("vGWAS_chaptI_RII_copy.RData")

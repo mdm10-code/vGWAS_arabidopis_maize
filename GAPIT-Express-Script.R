@@ -100,7 +100,12 @@ myGAPIT.zm.full <- GAPIT(
 zm_covar_500 <- myGAPIT.zm.500[["PCA"]]
 zm_covar_500 <- zm_covar_500[, c(1:5)]
 
-zm_covar_full <- myGAPIT_zm_full[["PCA"]]
+zm_covar_full <- myGAPIT.zm.full[["PCA"]]
+zm_covar_full <- zm_covar_full[, c(1:5)]
+
+#Now I extract the kinship matrices
+myKI.zm.500 <- myGAPIT.zm.500[["KI"]]
+myKI.zm.full <- myGAPIT.zm.full[["KI"]]
 
 ############
 #This next section is to run all simulations using GAPIT

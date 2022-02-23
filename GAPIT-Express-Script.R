@@ -507,4 +507,45 @@ GAPIT(
   model = "MLM"
 )
 
+GAPIT.expressway <- function(wd = NULL, trait_list = NULL, GD = NULL, GM = NULL, CV = NULL, K = NULL) {
+  for(h in 1:length(trait_list)) {
+    print(paste0("this is trait", h))
+    new_folder <- dir.create(paste0(wd, names(trait_list)[[h]]))
+    setwd(paste0(wd, names(trait_list)[[h]]))
+    myY <- trait_list[[h]]
+    GAPIT(
+      Y = data.frame(myY), 
+      GD = GD,
+      GM = GM,
+      CV = CV,
+      K = K,
+      group.from = dim(myY)[1],
+      group.to = dim(myY)[1],
+      SNP.effect = "Add",
+      model = "MLM"
+    )
+  }
+}
+
+zm.pheno.FULL.listI <- list(sp.zm.null.full,
+                            sp.zm.GxE.FULL.mod,
+                            zm.vpheno.molike.MAF10.h233.vQTN10.FULL,
+                            zm.vpheno.molike.MAF10.h233.vQTN50.FULL,
+                            zm.vpheno.molike.MAF10.h233.vQTN90.FULL,
+                            zm.vpheno.molike.MAF10.h263.vQTN10.FULL)
+
+
+names(zm.pheno.FULL.listI)[[1]] <- "sp.zm.null.full"
+names(zm.pheno.FULL.listI)[[2]] <- "sp.zm.GxE.FULL.mod"
+names(zm.pheno.FULL.listI)[[3]] <- "zm.vpheno.molike.MAF10.h233.vQTN10.FULL"
+names(zm.pheno.FULL.listI)[[4]] <- "zm.vpheno.molike.MAF10.h233.vQTN50.FULL"
+names(zm.pheno.FULL.listI)[[5]] <- "zm.vpheno.molike.MAF10.h233.vQTN90.FULL"
+names(zm.pheno.FULL.listI)[[6]] <- "zm.vpheno.molike.MAF10.h263.vQTN10.FULL"
+
+wd$zm_gapit_FULL <- "~/projects/dissertation/RII/2_pipeline/out/GAPIT/zm/FULL/"
+
+#Trait list I
+GAPIT.expressway(wd = wd$zm_gapit_FULL, trait_list = zm.pheno.FULL.listI, GD = data.frame(sp.zm.null.full[, 1], zm.just.geno.full), GM = zm.map[, c(1, 3, 4)], CV = zm_covar_full, K = myKI.zm.full)
+
+
 save.image("~/vGWAS_chaptI_RII.RData")

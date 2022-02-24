@@ -1,5 +1,5 @@
 #########################vGWAS-GAPIT SCRIPT#################
-load("~/vGWAS_chaptI_RII.RData")
+load("~/vGWAS_chaptI_RII_copy.RData")
 
 setwd("C:/Users/mdm10/Documents/Projects/Dissertation/Chapter_one/RII/2_pipeline/out")
 
@@ -542,10 +542,55 @@ names(zm.pheno.FULL.listI)[[4]] <- "zm.vpheno.molike.MAF10.h233.vQTN50.FULL"
 names(zm.pheno.FULL.listI)[[5]] <- "zm.vpheno.molike.MAF10.h233.vQTN90.FULL"
 names(zm.pheno.FULL.listI)[[6]] <- "zm.vpheno.molike.MAF10.h263.vQTN10.FULL"
 
-wd$zm_gapit_FULL <- "~/projects/dissertation/RII/2_pipeline/out/GAPIT/zm/FULL/"
+#Trait list II
+#This is for list II
+zm.vpheno.molike.MAF10.h263.vQTN50.FULL$taxa <- zm_covar_full$taxa
+zm.vpheno.molike.MAF10.h263.vQTN90.FULL$taxa <- zm_covar_full$taxa
+zm.vpheno.molike.MAF40.h233.vQTN10.FULL$taxa <- zm_covar_full$taxa
+zm.vpheno.molike.MAF40.h233.vQTN50.FULL$taxa <- zm_covar_full$taxa
+zm.vpheno.molike.MAF40.h233.vQTN90.FULL$taxa <- zm_covar_full$taxa
+zm.vpheno.molike.MAF40.h263.vQTN10.FULL$taxa <- zm_covar_full$taxa
+
+zm.pheno.FULL.listII <- list(zm.vpheno.molike.MAF10.h263.vQTN50.FULL,
+                             zm.vpheno.molike.MAF10.h263.vQTN90.FULL,
+                             zm.vpheno.molike.MAF40.h233.vQTN10.FULL,
+                             zm.vpheno.molike.MAF40.h233.vQTN50.FULL,
+                             zm.vpheno.molike.MAF40.h233.vQTN90.FULL,
+                             zm.vpheno.molike.MAF40.h263.vQTN10.FULL)
+
+names(zm.pheno.FULL.listII)[[1]] <- "zm.vpheno.molike.MAF10.h263.vQTN50.FULL"
+names(zm.pheno.FULL.listII)[[2]] <- "zm.vpheno.molike.MAF10.h263.vQTN90.FULL"
+names(zm.pheno.FULL.listII)[[3]] <- "zm.vpheno.molike.MAF40.h233.vQTN10.FULL"
+names(zm.pheno.FULL.listII)[[4]] <- "zm.vpheno.molike.MAF40.h233.vQTN50.FULL"
+names(zm.pheno.FULL.listII)[[5]] <- "zm.vpheno.molike.MAF40.h233.vQTN90.FULL"
+names(zm.pheno.FULL.listII)[[6]] <- "zm.vpheno.molike.MAF40.h263.vQTN10.FULL"
+
+#
+#It also appears that the formating of the taxa is different between all
+#phenotypic objects. To make sure that GAPIT doesn't stop running
+#I will modify the taxa as seen in sp.zm.null.full
+
+#
+zm.vpheno.molike.MAF10.h263.vQTN50.FULL$taxa <- sp.zm.null.full$`<Trait>`
+zm.vpheno.molike.MAF10.h263.vQTN90.FULL$taxa <- sp.zm.null.full$`<Trait>`
+zm.vpheno.molike.MAF40.h233.vQTN10.FULL$taxa <- sp.zm.null.full$`<Trait>`
+zm.vpheno.molike.MAF40.h233.vQTN50.FULL$taxa <- sp.zm.null.full$`<Trait>`
+zm.vpheno.molike.MAF40.h233.vQTN90.FULL$taxa <- sp.zm.null.full$`<Trait>`
+zm.vpheno.molike.MAF10.h263.vQTN10.FULL$taxa <- sp.zm.null.full$`<Trait>`
+
+#
+zm_covar_full <- myGAPIT.zm.full[["PCA"]]
+zm_covar_full <- zm_covar_full[, c(1:4)]
+
+
+wd$zm_gapit_FULL <- "C:/Users/mdm10/Documents/PROJECTS/Dissertation/Chapter_one/RII/2_pipeline/GAPIT/zm/FULL/"
 
 #Trait list I
 GAPIT.expressway(wd = wd$zm_gapit_FULL, trait_list = zm.pheno.FULL.listI, GD = data.frame(sp.zm.null.full[, 1], zm.just.geno.full), GM = zm.map[, c(1, 3, 4)], CV = zm_covar_full, K = myKI.zm.full)
+
+#Trait list II
+
+GAPIT.expressway(wd = wd$zm_gapit_FULL, trait_list = zm.pheno.FULL.listII, GD = data.frame(sp.zm.null.full[, 1], zm.just.geno.full), GM = zm.map[, c(1, 3, 4)], CV = zm_covar_full, K = myKI.zm.full)
 
 
 save.image("~/vGWAS_chaptI_RII.RData")

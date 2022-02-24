@@ -565,6 +565,13 @@ names(zm.pheno.FULL.listII)[[4]] <- "zm.vpheno.molike.MAF40.h233.vQTN50.FULL"
 names(zm.pheno.FULL.listII)[[5]] <- "zm.vpheno.molike.MAF40.h233.vQTN90.FULL"
 names(zm.pheno.FULL.listII)[[6]] <- "zm.vpheno.molike.MAF40.h263.vQTN10.FULL"
 
+##Pheno List III
+zm.pheno.FULL.listIII <- list(zm.vpheno.molike.MAF40.h263.vQTN50.FULL,
+                              zm.vPheno.molike.MAF40.full)
+
+names(zm.pheno.FULL.listIII)[[1]] <- "zm.vpheno.molike.MAF40.h263.vQTN50.FULL"
+names(zm.pheno.FULL.listIII)[[2]] <- "zm.vPheno.molike.MAF40.full"
+
 #
 #It also appears that the formating of the taxa is different between all
 #phenotypic objects. To make sure that GAPIT doesn't stop running
@@ -576,21 +583,27 @@ zm.vpheno.molike.MAF10.h263.vQTN90.FULL$taxa <- sp.zm.null.full$`<Trait>`
 zm.vpheno.molike.MAF40.h233.vQTN10.FULL$taxa <- sp.zm.null.full$`<Trait>`
 zm.vpheno.molike.MAF40.h233.vQTN50.FULL$taxa <- sp.zm.null.full$`<Trait>`
 zm.vpheno.molike.MAF40.h233.vQTN90.FULL$taxa <- sp.zm.null.full$`<Trait>`
-zm.vpheno.molike.MAF10.h263.vQTN10.FULL$taxa <- sp.zm.null.full$`<Trait>`
+zm.vpheno.molike.MAF40.h263.vQTN10.FULL$taxa <- sp.zm.null.full$`<Trait>`
+
+#Now we do the same for List III
+zm.vpheno.molike.MAF40.h263.vQTN50.FULL$taxa <- sp.zm.null.full$`<Trait>`
+zm.vPheno.molike.MAF40.full$taxa <- sp.zm.null.full$`<Trait>`
 
 #
 zm_covar_full <- myGAPIT.zm.full[["PCA"]]
 zm_covar_full <- zm_covar_full[, c(1:4)]
 
 
-wd$zm_gapit_FULL <- "C:/Users/mdm10/Documents/PROJECTS/Dissertation/Chapter_one/RII/2_pipeline/GAPIT/zm/FULL/"
+wd$zm_gapit_FULL <- "C:/Users/mdm10/Documents/Projects/Dissertation/Chapter_one/RII/2_pipeline/out/vGWAS_chapter_one_zm/GAPIT/FULL/"
 
 #Trait list I
 GAPIT.expressway(wd = wd$zm_gapit_FULL, trait_list = zm.pheno.FULL.listI, GD = data.frame(sp.zm.null.full[, 1], zm.just.geno.full), GM = zm.map[, c(1, 3, 4)], CV = zm_covar_full, K = myKI.zm.full)
 
 #Trait list II
-
 GAPIT.expressway(wd = wd$zm_gapit_FULL, trait_list = zm.pheno.FULL.listII, GD = data.frame(sp.zm.null.full[, 1], zm.just.geno.full), GM = zm.map[, c(1, 3, 4)], CV = zm_covar_full, K = myKI.zm.full)
 
+#Trait list III
+GAPIT.expressway(wd = wd$zm_gapit_FULL, trait_list = zm.pheno.FULL.listIII, GD = data.frame(sp.zm.null.full[, 1], zm.just.geno.full), GM = zm.map[, c(1, 3, 4)], CV = zm_covar_full, K = myKI.zm.full)
 
-save.image("~/vGWAS_chaptI_RII.RData")
+
+save.image("~/vGWAS_chaptI_RII_copy.RData")

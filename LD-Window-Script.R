@@ -19,7 +19,7 @@ library(dplyr)
 #LD_rate_calc <- function(geno.numeric = NULL, qtn.info.dir.root = NULL, qtn.folder.name = NULL,  results.folder.root = NULL, results.folder.name = NULL) {
 #  
 #}
-LD_rate_calc <- function(qtn.info.dir.root = NULL, qtn.folder.name = NULL, results.folder.root = NULL, results.folder.name = NULL, results = NULL, test = NULL, trait = NULL, species = NULL, size = NULL) {
+LD_rate_calc <- function(qtn.info.dir.root = NULL, qtn.folder.name = NULL, results.folder.root = NULL, results.folder.name = NULL, results = NULL, test = NULL, trait = NULL, species = NULL, size = NULL, geno = NULL) {
   if(results == "NULL") {
     vGWAS_rate_results <- matrix(0, nrow = 101, ncol = 5)
     vGWAS_rate_results[101, 1] <- "Rates"
@@ -30,6 +30,13 @@ LD_rate_calc <- function(qtn.info.dir.root = NULL, qtn.folder.name = NULL, resul
     for(file in 1:length(results.vec)) {
       print(file)
       result.file <- fread(paste0(results.folder.output, results.vec[file]))
+      if(test == "DGLM") {
+        result.file <- data.frame(snp = result.file$snp, chr = result.file$chr, pos = result.file$pos, p.value = result.file$P.disp, fdr = result.file$fdr.disp)
+      } else {
+        if(test == "GAPIT") {
+          result.file <- data.frame(snp = result.file$SNP, chr = result.file$Chromosome, pos = result.file$Position , p.value = result.file$P.value, fdr = result.file$FDR_Adjusted_P-values)
+        }
+      }
       fdr.five.snps <- result.file %>%
         select(snp, chr, pos, p.value, fdr) %>%
         filter(fdr < 0.05 & p.value < fdr)
@@ -52,17 +59,32 @@ LD_rate_calc <- function(qtn.info.dir.root = NULL, qtn.folder.name = NULL, resul
     write.csv(vGWAS_rate_results, file = paste0(test, "_", species, "_", trait, "_", "detection.rates", ".csv"), row.names = F)
   }
   if(results == "vQTL") {
-    vGWAS_rate_results <- matrix(NA, nrow = 101, ncol = 5)
+    print("Determing Dection Rates for simulated vQTLs")
+    vGWAS_rate_results <- matrix(0, nrow = 101, ncol = 5)
     colnames(vGWAS_rate_results) <- c("FILE", "FP_FDR5", "TP_FDR5", "FP_FDR10", "TP_FDR10")
     simulated.qtn.folder <- paste0(qtn.info.dir.root, qtn.folder.name, "/")
     vQTN.info <- fread(file = paste0(simulated.qtn.folder, "var.QTN.genotypic.information.csv"))
     vQTN.info <- vQTN.info[, c(2, 4, 5)]
     simchr <- vQTN.info$chr
     simSNP <- vQTN.info$snp
+    print(simSNP)
     results.folder.output <- paste0(results.folder.root, results.folder.name, "/")
     results.vec <- list.files(results.folder.output)
     for(file in 1:length(results.vec)) {
+      vGWAS_rate_results[file, 1] <- results.vec[file]
+      print(file)
       result.file <- fread(paste0(results.folder.output, results.vec[file]))
+      if(test == "DGLM") {
+        result.file <- data.frame(snp = result.file$snp, chr = result.file$chr, pos = result.file$pos, p.value = result.file$P.disp, fdr = result.file$fdr.disp)
+      } else {
+        if(test == "GAPIT") {
+          result.file <- data.frame(snp = result.file$SNP, chr = result.file$Chromosome, pos = result.file$Position , p.value = result.file$P.value, fdr = result.file$FDR_Adjusted_P-values)
+        }
+      }
+      result.file <- result.file[, c(1:4)]
+      simQ <- grep(TRUE, result.file$snp %in% simSNP)
+      result.file <- result.file[-c(simQ), ]
+      result.file$fdr <- p.adjust(result.file$p.value, "fdr")
       fdr.five.snps <- result.file %>%
         select(snp, chr, pos, p.value, fdr) %>%
         filter(fdr < 0.05 & p.value < fdr)
@@ -79,17 +101,117 @@ LD_rate_calc <- function(qtn.info.dir.root = NULL, qtn.folder.name = NULL, resul
       fdr.five.snps.samechr <- fdr.five.snps[fdr.five.snps$chr == simchr, ]
       fdr.ten.snps.samechr <- fdr.ten.snps[fdr.ten.snps$chr == simchr, ]
       snps.4.ld.fdr5 <- grep(TRUE, colnames(geno) %in% fdr.five.snps.samechr$snp)
-      where.simulatedQTN.is.at.fdr.5 <- grep(TRUE, colnames(geno) %in% simSNP)
+      where.simulatedQTN.is.at.fdr5 <- grep(TRUE, colnames(geno) %in% vQTN.info$snp)
       geno.4.ld.fdr5 <- geno[, c(where.simulatedQTN.is.at.fdr5, snps.4.ld.fdr5)]
       genosnpnames.fdr5 <- colnames(geno.4.ld.fdr5)
+      geno.4.ld.fdr5 <- as.matrix(geno.4.ld.fdr5)
       ldobject.fdr5 <- cor(geno.4.ld.fdr5)
-      ldobject.fdr5 <- ldobject^2
+      ldobject.fdr5 <- ldobject.fdr5^2
       rownames(ldobject.fdr5) <- genosnpnames.fdr5
       colnames(ldobject.fdr5) <- genosnpnames.fdr5
+      print(max(ldobject.fdr5[-c(1), 1]))
       if(max(ldobject.fdr5[-c(1), 1]) >= 0.1) {
-        vGWAS_rate_results[file, 4] <- 1
+        vGWAS_rate_results[file, 3] <- 1
       }
+      snps.4.ld.fdr10 <- grep(TRUE, colnames(geno) %in% fdr.five.snps.samechr$snp)
+      where.simulatedQTN.is.at.fdr10 <- grep(TRUE, colnames(geno) %in% simSNP)
+      geno.4.ld.fdr10 <- geno[, c(where.simulatedQTN.is.at.fdr10, snps.4.ld.fdr10)]
+      genosnpnames.fdr10 <- colnames(geno.4.ld.fdr10)
+      geno.4.ld.fdr10 <- as.matrix(geno.4.ld.fdr10)
+      ldobject.fdr10 <- cor(geno.4.ld.fdr10)
+      ldobject.fdr10 <- ldobject.fdr10^2
+      rownames(ldobject.fdr10) <- genosnpnames.fdr10
+      colnames(ldobject.fdr10) <- genosnpnames.fdr10
+      if(max(ldobject.fdr10[-c(1), 1]) >= 0.1) {
+        vGWAS_rate_results[file, 5] <- 1
+      }
+      print(vGWAS_rate_results[file, ])
     }
+    vGWAS_rate_results[101, 2] <- sum(as.numeric(vGWAS_rate_results[1:100, 2]))/100
+    vGWAS_rate_results[101, 3] <- sum(as.numeric(vGWAS_rate_results[1:100, 3]))/100
+    vGWAS_rate_results[101, 4] <- sum(as.numeric(vGWAS_rate_results[1:100, 4]))/100
+    vGWAS_rate_results[101, 5] <- sum(as.numeric(vGWAS_rate_results[1:100, 5]))/100
+    vGWAS_rate_results[101, 1] <- "Rates"
+    write.csv(vGWAS_rate_results, file = paste0(test, "_", species, "_", trait, "_", "detection.rates", ".csv"), row.names = F)
+  }
+  if(results == "SP") {
+    vGWAS_rate_results <- matrix(0, nrow = 101, ncol = 5)
+    colnames(vGWAS_rate_results) <- c("FILE", "FP_FDR5", "TP_FDR5", "FP_FDR10", "TP_FDR10")
+    simulated.qtn.folder <- paste0(qtn.info.dir.root, qtn.folder.name, "/")
+    sqf.files <- list.files(simulated.qtn.folder)
+    SP.info <- read.delim2(file = paste0(simulated.qtn.folder, sqf.files[1]))
+    SP.info <- data.frame(snp = SP.info$snp, chr = SP.info$chr, pos = SP.info$pos)
+    for(qtn in 1:nrow(SP.info)) {
+      sp.qtn.info <- SP.info[qtn, ]
+      simchr <- sp.qtn.info$chr
+      simSNP <- sp.qtn.info$snp
+      results.folder.output <- paste0(results.folder.root, results.folder.name, "/")
+      results.vec <- list.files(results.folder.output)
+      for(file in 1:length(results.vec)) {
+        vGWAS_rate_results[file, 1] <- results.vec[file]
+        print(file)
+        result.file <- fread(paste0(results.folder.output, results.vec[file]))
+        if(test == "DGLM") {
+          result.file <- data.frame(snp = result.file$snp, chr = result.file$chr, pos = result.file$pos, p.value = result.file$P.disp, fdr = result.file$fdr.disp)
+        } else {
+          if(test == "GAPIT") {
+            result.file <- data.frame(snp = result.file$SNP, chr = result.file$Chromosome, pos = result.file$Position , p.value = result.file$P.value, fdr = result.file$FDR_Adjusted_P-values)
+          }
+        }
+        result.file <- result.file[, c(1:4)]
+        simQ <- grep(TRUE, result.file$snp %in% simSNP)
+        result.file <- result.file[-c(simQ), ]
+        result.file$fdr <- p.adjust(result.file$p.value, "fdr")
+        fdr.five.snps <- result.file %>%
+          select(snp, chr, pos, p.value, fdr) %>%
+          filter(fdr < 0.05 & p.value < fdr)
+        
+        fdr.ten.snps <- result.file %>%
+          select(snp, chr, pos, p.value, fdr) %>%
+          filter(fdr < 0.10 & p.value < fdr)
+        
+        if(dim(fdr.five.snps[fdr.five.snps$chr != simchr, ])[1] > 0) {
+          vGWAS_rate_results[file, 2] <- 1
+        }
+        
+        if(dim(fdr.ten.snps[fdr.ten.snps$chr != simchr, ])[1] > 0) {
+          vGWAS_rate_results[file, 4] <- 1
+        }
+        fdr.five.snps.samechr <- fdr.five.snps[fdr.five.snps$chr == simchr, ]
+        fdr.ten.snps.samechr <- fdr.ten.snps[fdr.ten.snps$chr == simchr, ]
+        snps.4.ld.fdr5 <- grep(TRUE, colnames(geno) %in% fdr.five.snps.samechr$snp)
+        where.simulatedQTN.is.at.fdr5 <- grep(TRUE, colnames(geno) %in% vQTN.info$snp)
+        geno.4.ld.fdr5 <- geno[, c(where.simulatedQTN.is.at.fdr5, snps.4.ld.fdr5)]
+        genosnpnames.fdr5 <- colnames(geno.4.ld.fdr5)
+        geno.4.ld.fdr5 <- as.matrix(geno.4.ld.fdr5)
+        ldobject.fdr5 <- cor(geno.4.ld.fdr5)
+        ldobject.fdr5 <- ldobject.fdr5^2
+        rownames(ldobject.fdr5) <- genosnpnames.fdr5
+        colnames(ldobject.fdr5) <- genosnpnames.fdr5
+        if(max(ldobject.fdr5[-c(1), 1]) >= 0.1) {
+          vGWAS_rate_results[file, 4] <- 1
+        }
+        snps.4.ld.fdr10 <- grep(TRUE, colnames(geno) %in% fdr.five.snps.samechr$snp)
+        where.simulatedQTN.is.at.fdr10 <- grep(TRUE, colnames(geno) %in% simSNP)
+        geno.4.ld.fdr10 <- geno[, c(where.simulatedQTN.is.at.fdr10, snps.4.ld.fdr10)]
+        genosnpnames.fdr10 <- colnames(geno.4.ld.fdr10)
+        geno.4.ld.fdr10 <- as.matrix(geno.4.ld.fdr10)
+        ldobject.fdr10 <- cor(geno.4.ld.fdr10)
+        ldobject.fdr10 <- ldobject.fdr10^2
+        rownames(ldobject.fdr10) <- genosnpnames.fdr10
+        colnames(ldobject.fdr10) <- genosnpnames.fdr10
+        if(max(ldobject.fdr10[-c(1), 1]) >= 0.1) {
+          vGWAS_rate_results[file, 4] <- 1
+        }
+      }
+      vGWAS_rate_results[101, 2] <- sum(as.numeric(vGWAS_rate_results[1:100, 2]))/100
+      vGWAS_rate_results[101, 3] <- sum(as.numeric(vGWAS_rate_results[1:100, 3]))/100
+      vGWAS_rate_results[101, 4] <- sum(as.numeric(vGWAS_rate_results[1:100, 4]))/100
+      vGWAS_rate_results[101, 5] <- sum(as.numeric(vGWAS_rate_results[1:100, 5]))/100
+      vGWAS_rate_results[101, 1] <- "Rates"
+      write.csv(vGWAS_rate_results, file = paste0(test, "_", species, "_", trait, "_", "detection.rates", ".csv"), row.names = F)
+    }
+    
   }
 #  simulated.qtn.folder <- paste0(qtn.info.dir.root, qtn.folder.name, "/")
 #  vQTN.info <- fread(file = paste0(simulated.qtn.folder, "var.QTN.genotypic.information.csv"))
@@ -98,11 +220,36 @@ LD_rate_calc <- function(qtn.info.dir.root = NULL, qtn.folder.name = NULL, resul
 #  colnames(vGWAS_rate_results) <- c("file", "FP_FDR5", "TP_FDR5", "FP_FDR10", "TP_FDR10")
 } 
 
+#grepl("*_Selected_QTNs.txt", x)
+
 BFT.results.full.root <- "C:/Users/mdm10/Documents/Ph.D._Dissertation/Projects/Dissertation_research/Chapter_One/R2/2_pipeline/out/vGWAS_chapter_one_zm/vGWAS_results/BFT/FULL/"
 
-LD_rate_calc(qtn.info.dir.root = NULL, qtn.folder.name = NULL, results.folder.root = BFT.results.full.root, results.folder.name = "BFT_sp.zm.null.full", results = "NULL", test = "BFT", species = "zm", trait = "NULL", size = "2815")
+#For these next lines, I am going to run my LD_rate_calc code
+#I will specificy the the output folder directory
+three.output <- "C:/Users/mdm10/Documents/Ph.D._Dissertation/Projects/Dissertation_research/Chapter_One/R2/3_output/"
+setwd(three.output)
 
+##NULL
+###FULL
+LD_rate_calc(qtn.info.dir.root = NULL, qtn.folder.name = NULL, results.folder.root = BFT.results.full.root, results.folder.name = "BFT_sp.zm.null.full", results = "NULL", test = "BFT", species = "zm", trait = "NULL", size = "2815", geno = zm.geno.numeric.full)
 
+##Actual traits
+zm.vQTL.sim.folders <- "C:/Users/mdm10/Documents/Ph.D._Dissertation/Projects/Dissertation_research/Chapter_One/R2/2_pipeline/out/vGWAS_chapter_one_zm/zm_vQTL_simulations/"
+
+#simplePHENOTYPES
+zm.sp.sim.folders <- "C:/Users/mdm10/Documents/Ph.D._Dissertation/Projects/Dissertation_research/Chapter_One/R2/2_pipeline/out/vGWAS_chapter_one_zm/zm_sp_results/"
+
+#zm_vmolike_MAF10_h233_vQTN10_FULL
+##FULL
+LD_rate_calc(qtn.info.dir.root = zm.vQTL.sim.folders, qtn.folder.name = "zm_vmolike_MAF10_h233_vQTN10_FULL", results.folder.root = BFT.results.full.root, results.folder.name = "BFT_zm.vpheno.molike.MAF10.h233.vQTN10.FULL", results = "vQTL", test = "BFT", species = "zm", trait = "zm_vmolike_MAF10_h233_vQTN10_FULL", size = "2815", geno = zm.just.geno.full)
+
+#BFT_zm.vpheno.molike.MAF10.h263.vQTN50.FULL
+##FULL
+LD_rate_calc(qtn.info.dir.root = zm.vQTL.sim.folders, qtn.folder.name = "zm_vmolike_MAF10_h263_vQTN50_FULL", results.folder.root = BFT.results.full.root, results.folder.name = "BFT_zm.vpheno.molike.MAF10.h263.vQTN50.FULL", results = "vQTL", test = "BFT", species = "zm", trait = "zm_vmolike_MAF10_h263_vQTN50_FULL", size = "2815", geno = zm.just.geno.full)
+
+#BFT_zm.vpheno.molike.MAF40.h233.vQTN10.FULL
+##FULL
+LD_rate_calc(qtn.info.dir.root = zm.vQTL.sim.folders, qtn.folder.name = "zm_vmolike_MAF40_h233_vQTN10_FULL_filtlike_at", results.folder.root = BFT.results.full.root, results.folder.name = "BFT_zm.vpheno.molike.MAF40.h233.vQTN10.FULL", results = "vQTL", test = "BFT", species = "zm", trait = "zm_vmolike_MAF40_h233_vQTN10_FULL", size = "2815", geno = zm.just.geno.full)
 
 
 

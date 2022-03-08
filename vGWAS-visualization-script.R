@@ -24,6 +24,9 @@ wd$three_output_figures <- paste0(wd$three_output, "Figs/")
 ###This is the Master File for all the rates
 TnF_rates_master <- read.csv(paste0(wd$three_output, "TnF.Rates.Master.1.11.2021.csv"))
 
+#
+TnF_rates <- read.csv(paste0(wd$three_output, "Detection_rates_3_8_2022.csv"))
+
 ############################################################
 ######################### Images ########################
 ###########################################################
@@ -63,9 +66,18 @@ ggplot() +
   scale_fill_manual("Test", values = c("BFT" = "darkorange3", "DGLM" = "navyblue", "MLM" = "magenta4"))
 dev.off()
 
-zm_500_GxE_rates <- TnF_rates_master %>%
+zm_500_GxE_rates <- TnF_rates %>%
   select(Test, Species, Trait, Sample.Size, SNP, SNP.Code.Name, Heritability, Effect.Size, MAF, Window.Size, BP_5_FP, BP_5_TP, BP_10_FP, BP_10_TP, FDR_5_FP, FDR_5_TP, FDR_10_FP, FDR_10_TP) %>%
   filter(Trait == "GxE" & Sample.Size == "500" & Species == "Maize")
+
+for (i in 1:nrow(zm_500_GxE_rates)) {
+  the.results <- exactci(x = zm_500_GxE_rates[i, 16] * 100, n = 100, conf.level = 0.95)
+  zm_500_GxE_rates[i, 19] <- the.results$conf.int[1]
+  zm_500_GxE_rates[i, 20] <- the.results$conf.int[2]
+  rm(the.results)
+}
+
+colnames(zm_500_GxE_rates)[19:20] <- c("FDR5_lb", "FDR5_ub")
 
 ##Maize N = 500
 tiff(file = "True Positive Detection Rates-Maize (N = 500) GxE.tiff",
@@ -80,9 +92,42 @@ ggplot() +
   scale_fill_manual("Test", values = c("BFT" = "darkorange3", "DGLM" = "navyblue", "MLM" = "magenta4"))
 dev.off()
 
-zm_full_GxE_rates <- TnF_rates_master %>%
+###
+tiff(file = "Maize_N500_True_Positives.tiff",
+     width = 800, height = 400, res = 100)
+ggplot(zm_500_GxE_rates, aes(x = SNP.Code.Name, y = FDR_5_TP, fill = Test)) +
+  geom_bar(colour = "black",  stat = "identity", position = position_dodge(width = .8), size = .3, width = 0.8)+
+  geom_errorbar(aes(x = SNP.Code.Name, ymin = FDR5_lb, ymax = FDR5_ub) , width = .2, position = position_dodge(.8))+
+#  facet_grid(~ SNP.Code.Name, scales = "free_x", space = "free_x") +
+  xlab("QTN") +
+  labs(title = "Maize (N = 500) GxE Setting") +
+  theme(plot.title = element_text(hjust = 0.50)) +
+  ylab("% of Replications with a True Positive") +
+  ylim(0, 1.00) + 
+#  geom_hline(yintercept = 0.05, linetype = "dashed", color = "red") + 
+  scale_fill_manual("Test", values = c("BFT" = "darkorange3", "DGLM" = "navyblue"))+
+  theme(panel.border = element_rect(fill = NA, linetype = "dashed")) +
+  theme_gray(base_size = 12) + theme( panel.border = element_rect(fill = NA, colour = "black"))+
+  theme(strip.background =  element_rect(fill = "white", colour = "white"))+
+  theme(axis.text.x = element_text(colour = "black",family = "Times", size = 12), axis.ticks = element_blank(), axis.ticks.length = unit(0.1, "cm")) +
+  theme(axis.title.y = element_text(vjust = 1.3,colour = "black",family = "Times", size = 12), axis.text.y = element_text(  colour = "black", family = "Times"), axis.ticks = element_blank())+
+  theme(panel.grid.major.x = element_blank(), panel.grid.minor = element_blank())
+dev.off()
+###
+
+zm_full_GxE_rates <- TnF_rates %>%
   select(Test, Species, Trait, Sample.Size, SNP, SNP.Code.Name, Heritability, Effect.Size, MAF, Window.Size, BP_5_FP, BP_5_TP, BP_10_FP, BP_10_TP, FDR_5_FP, FDR_5_TP, FDR_10_FP, FDR_10_TP) %>%
   filter(Trait == "GxE" & Sample.Size == "FULL" & Species == "Maize")
+
+for (i in 1:nrow(zm_full_GxE_rates)) {
+  the.results <- exactci(x = zm_full_GxE_rates[i, 16] * 100, n = 100, conf.level = 0.95)
+  zm_full_GxE_rates[i, 19] <- the.results$conf.int[1]
+  zm_full_GxE_rates[i, 20] <- the.results$conf.int[2]
+  rm(the.results)
+}
+
+colnames(zm_full_GxE_rates)[19:20] <- c("FDR5_lb", "FDR5_ub")
+
 
 ##Maize N = 500
 tiff(file = "True Positive Detection Rates-Maize FULL (N = 2532) GxE.tiff",
@@ -96,6 +141,29 @@ ggplot() +
   theme(plot.title = element_text(hjust = 0.5)) +
   scale_fill_manual("Test", values = c("BFT" = "darkorange3", "DGLM" = "navyblue", "MLM" = "magenta4"))
 dev.off()
+
+###
+tiff(file = "Maize_N2815_True_Positives.tiff",
+     width = 800, height = 400, res = 100)
+ggplot(zm_full_GxE_rates, aes(x = SNP.Code.Name, y = FDR_5_TP, fill = Test)) +
+  geom_bar(colour = "black",  stat = "identity", position = position_dodge(width = .8), size = .3, width = 0.8)+
+  geom_errorbar(aes(x = SNP.Code.Name, ymin = FDR5_lb, ymax = FDR5_ub) , width = .2, position = position_dodge(.8))+
+  #  facet_grid(~ SNP.Code.Name, scales = "free_x", space = "free_x") +
+  xlab("QTN") +
+  labs(title = "Maize (N = 2815) GxE Setting") +
+  theme(plot.title = element_text(hjust = 0.50)) +
+  ylab("% of Replications with a True Positive") +
+  ylim(0, 1.00) + 
+  #  geom_hline(yintercept = 0.05, linetype = "dashed", color = "red") + 
+  scale_fill_manual("Test", values = c("BFT" = "darkorange3", "DGLM" = "navyblue"))+
+  theme(panel.border = element_rect(fill = NA, linetype = "dashed")) +
+  theme_gray(base_size = 12) + theme( panel.border = element_rect(fill = NA, colour = "black"))+
+  theme(strip.background =  element_rect(fill = "white", colour = "white"))+
+  theme(axis.text.x = element_text(colour = "black",family = "Times", size = 12), axis.ticks = element_blank(), axis.ticks.length = unit(0.1, "cm")) +
+  theme(axis.title.y = element_text(vjust = 1.3,colour = "black",family = "Times", size = 12), axis.text.y = element_text(  colour = "black", family = "Times"), axis.ticks = element_blank())+
+  theme(panel.grid.major.x = element_blank(), panel.grid.minor = element_blank())
+dev.off()
+###
 
 ####Epistasis
 at_500_Epistasis_rates <- TnF_rates_master %>%
@@ -143,13 +211,45 @@ dev.off()
 
 ###Maize 
 ##500
-zm_500_Epistasis_rates <- TnF_rates_master %>%
+zm_500_Epistasis_rates <- TnF_rates %>%
   select(Test, Species, Trait, Sample.Size, SNP, SNP.Code.Name, Heritability, Effect.Size, MAF, Window.Size, BP_5_FP, BP_5_TP, BP_10_FP, BP_10_TP, FDR_5_FP, FDR_5_TP, FDR_10_FP, FDR_10_TP) %>%
   filter(Trait == "Epistasis" & Sample.Size == "500" & Species == "Maize" & Effect.Size == 0.75)
 
 zm_500_Epistasis_rates$Heritability <- gsub(0.30, "H2 = 0.30", zm_500_Epistasis_rates$Heritability)
 zm_500_Epistasis_rates$Heritability <- gsub(0.80, "H2 = 0.80", zm_500_Epistasis_rates$Heritability)
 
+for (i in 1:nrow(zm_500_Epistasis_rates)) {
+  the.results <- exactci(x = zm_500_Epistasis_rates[i, 16] * 100, n = 100, conf.level = 0.95)
+  zm_500_Epistasis_rates[i, 19] <- the.results$conf.int[1]
+  zm_500_Epistasis_rates[i, 20] <- the.results$conf.int[2]
+  rm(the.results)
+}
+
+colnames(zm_500_Epistasis_rates)[19:20] <- c("FDR5_lb", "FDR5_ub")
+
+
+###
+tiff(file = "Maize_N500_Epistasis_True_Positives.tiff",
+     width = 800, height = 400, res = 100)
+ggplot(zm_500_Epistasis_rates, aes(x = SNP.Code.Name, y = FDR_5_TP, fill = Test)) +
+  geom_bar(colour = "black",  stat = "identity", position = position_dodge(width = .8), size = .3, width = 0.8)+
+  geom_errorbar(aes(x = SNP.Code.Name, ymin = FDR5_lb, ymax = FDR5_ub) , width = .2, position = position_dodge(.8))+
+  facet_grid(~ Heritability, scales = "free_x", space = "free_x") +
+  xlab("QTN") +
+  labs(title = "Maize (N = 500) Epistasis Setting") +
+  theme(plot.title = element_text(hjust = 0.50)) +
+  ylab("% of Replications with a True Positive") +
+  ylim(0, 1.00) + 
+  #  geom_hline(yintercept = 0.05, linetype = "dashed", color = "red") + 
+  scale_fill_manual("Test", values = c("BFT" = "darkorange3", "DGLM" = "navyblue"))+
+  theme(panel.border = element_rect(fill = NA, linetype = "dashed")) +
+  theme_gray(base_size = 12) + theme( panel.border = element_rect(fill = NA, colour = "black"))+
+  theme(strip.background =  element_rect(fill = "white", colour = "white"))+
+  theme(axis.text.x = element_text(colour = "black",family = "Times", size = 12), axis.ticks = element_blank(), axis.ticks.length = unit(0.1, "cm")) +
+  theme(axis.title.y = element_text(vjust = 1.3,colour = "black",family = "Times", size = 12), axis.text.y = element_text(  colour = "black", family = "Times"), axis.ticks = element_blank())+
+  theme(panel.grid.major.x = element_blank(), panel.grid.minor = element_blank())
+dev.off()
+##
 
 ##Maize N = 500
 tiff(file = "True Positive Detection Rates-Maize (N = 500) Epistasis.tiff",
@@ -166,12 +266,44 @@ ggplot() +
 dev.off()
 
 ###FULL
-zm_full_Epistasis_rates <- TnF_rates_master %>%
+zm_full_Epistasis_rates <- TnF_rates %>%
   select(Test, Species, Trait, Sample.Size, SNP, SNP.Code.Name, Heritability, Effect.Size, MAF, Window.Size, BP_5_FP, BP_5_TP, BP_10_FP, BP_10_TP, FDR_5_FP, FDR_5_TP, FDR_10_FP, FDR_10_TP) %>%
   filter(Trait == "Epistasis" & Sample.Size == "FULL" & Species == "Maize" & Effect.Size == 0.75)
 
 zm_full_Epistasis_rates$Heritability <- gsub(0.30, "H2 = 0.30", zm_full_Epistasis_rates$Heritability)
 zm_full_Epistasis_rates$Heritability <- gsub(0.80, "H2 = 0.80", zm_full_Epistasis_rates$Heritability)
+
+for (i in 1:nrow(zm_full_Epistasis_rates)) {
+  the.results <- exactci(x = zm_full_Epistasis_rates[i, 16] * 100, n = 100, conf.level = 0.95)
+  zm_full_Epistasis_rates[i, 19] <- the.results$conf.int[1]
+  zm_full_Epistasis_rates[i, 20] <- the.results$conf.int[2]
+  rm(the.results)
+}
+
+colnames(zm_full_Epistasis_rates)[19:20] <- c("FDR5_lb", "FDR5_ub")
+
+######
+tiff(file = "Maize_N2815_Epistasis_True_Positives.tiff",
+     width = 800, height = 400, res = 100)
+ggplot(zm_full_Epistasis_rates, aes(x = SNP.Code.Name, y = FDR_5_TP, fill = Test)) +
+  geom_bar(colour = "black",  stat = "identity", position = position_dodge(width = .8), size = .3, width = 0.8)+
+  geom_errorbar(aes(x = SNP.Code.Name, ymin = FDR5_lb, ymax = FDR5_ub) , width = .2, position = position_dodge(.8))+
+  facet_grid(~ Heritability, scales = "free_x", space = "free_x") +
+  xlab("QTN") +
+  labs(title = "Maize (N = 2815) Epistasis Setting") +
+  theme(plot.title = element_text(hjust = 0.50)) +
+  ylab("% of Replications with a True Positive") +
+  ylim(0, 1.00) + 
+  #  geom_hline(yintercept = 0.05, linetype = "dashed", color = "red") + 
+  scale_fill_manual("Test", values = c("BFT" = "darkorange3", "DGLM" = "navyblue"))+
+  theme(panel.border = element_rect(fill = NA, linetype = "dashed")) +
+  theme_gray(base_size = 12) + theme( panel.border = element_rect(fill = NA, colour = "black"))+
+  theme(strip.background =  element_rect(fill = "white", colour = "white"))+
+  theme(axis.text.x = element_text(colour = "black",family = "Times", size = 12), axis.ticks = element_blank(), axis.ticks.length = unit(0.1, "cm")) +
+  theme(axis.title.y = element_text(vjust = 1.3,colour = "black",family = "Times", size = 12), axis.text.y = element_text(  colour = "black", family = "Times"), axis.ticks = element_blank())+
+  theme(panel.grid.major.x = element_blank(), panel.grid.minor = element_blank())
+dev.off()
+######
 
 ##Maize N = 2532
 tiff(file = "True Positive Detection Rates-Maize (N = 2532) Epistasis.tiff",
@@ -188,21 +320,55 @@ ggplot() +
 dev.off()
 
 ###This next section is for Molike
-TnF_rates_master$MAF <- gsub(0.10, "MAF = 0.10", TnF_rates_master$MAF)
-TnF_rates_master$MAF <- gsub(0.40, "MAF = 0.40", TnF_rates_master$MAF)
+TnF_rates$MAF <- gsub(0.10, "MAF = 0.10", TnF_rates$MAF)
+TnF_rates$MAF <- gsub(0.40, "MAF = 0.40", TnF_rates$MAF)
 
-TnF_rates_master$Heritability <- gsub(0.33, "h2 = 0.33", TnF_rates_master$Heritability)
-TnF_rates_master$Heritability <- gsub(0.63, "h2 = 0.63", TnF_rates_master$Heritability)
+TnF_rates$Heritability <- gsub(0.33, "h2 = 0.33", TnF_rates$Heritability)
+TnF_rates$Heritability <- gsub(0.63, "h2 = 0.63", TnF_rates$Heritability)
 
-molike_zm <- TnF_rates_master %>%
+molike_zm <- TnF_rates%>%
   select(Test, Species, Trait, Sample.Size, SNP, SNP.Code.Name, Heritability, Effect.Size, MAF, Window.Size, BP_5_FP, BP_5_TP, BP_10_FP, BP_10_TP, FDR_5_FP, FDR_5_TP, FDR_10_FP, FDR_10_TP) %>%
   filter(Species == "Maize" & Trait == "Molike")
 
-molike_zm$Sample.Size <- gsub("FULL", "N = 2532", molike_zm$Sample.Size)
+molike_zm$Sample.Size <- gsub("FULL", "N = 2815", molike_zm$Sample.Size)
 molike_zm$Sample.Size <- gsub("500", "N = 500", molike_zm$Sample.Size)
 
 molike_zm$Effect.Size <- as.factor(molike_zm$Effect.Size)
-molike_zm$Sample.Size <- factor(molike_zm$Sample.Size, levels = c("N = 500", "N = 2532"))
+molike_zm$Sample.Size <- factor(molike_zm$Sample.Size, levels = c("N = 500", "N = 2815"))
+
+for (i in 1:nrow(molike_zm)) {
+  the.results <- exactci(x = molike_zm[i, 16] * 100, n = 100, conf.level = 0.95)
+  molike_zm[i, 19] <- the.results$conf.int[1]
+  molike_zm[i, 20] <- the.results$conf.int[2]
+  rm(the.results)
+}
+
+colnames(molike_zm)[19:20] <- c("FDR5_lb", "FDR5_ub")
+
+
+###
+tiff(file = "Maize_N2815_Epistasis_True_Positives.tiff",
+     width = 800, height = 400, res = 100)
+ggplot(molike_zm, aes(x = Effect.Size, y = FDR_5_TP, fill = Test)) +
+  geom_bar(colour = "black",  stat = "identity", position = position_dodge(width = .8), size = .3, width = 0.8)+
+  geom_errorbar(aes(x = Effect.Size, ymin = FDR5_lb, ymax = FDR5_ub) , width = .2, position = position_dodge(.8))+
+  facet_grid(MAF ~ Heritability + Sample.Size, scales = "free_x", space = "free_x") +
+  xlab("QTN") +
+  labs(title = "Maize Molike Setting") +
+  theme(plot.title = element_text(hjust = 0.50)) +
+  ylab("% of Replications with a True Positive") +
+  ylim(0, 1.00) + 
+  #  geom_hline(yintercept = 0.05, linetype = "dashed", color = "red") + 
+  scale_fill_manual("Test", values = c("BFT" = "darkorange3", "DGLM" = "navyblue"))+
+  theme(panel.border = element_rect(fill = NA, linetype = "dashed")) +
+  theme_gray(base_size = 12) + theme( panel.border = element_rect(fill = NA, colour = "black"))+
+  theme(strip.background =  element_rect(fill = "white", colour = "white"))+
+  theme(axis.text.x = element_text(colour = "black",family = "Times", size = 12), axis.ticks = element_blank(), axis.ticks.length = unit(0.1, "cm")) +
+  theme(axis.title.y = element_text(vjust = 1.3,colour = "black",family = "Times", size = 12), axis.text.y = element_text(  colour = "black", family = "Times"), axis.ticks = element_blank())+
+  theme(panel.grid.major.x = element_blank(), panel.grid.minor = element_blank())
+dev.off()
+###
+
 
 tiff(file = "True Positive Detection Rates-Maize Molike.tiff",
      width = 641, height = 376, res = 100)

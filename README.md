@@ -20,3 +20,5 @@ The following is an outline/order of the scripts used for this publication with 
 8.) Applied-vGWAS-script.R : This script was used to conduct BFT and DGLM on plant height residuals in maize
 
 9.) Applied-vGWAS-Visuals-Script.R : This script was used to visualize the results from MLM, BFT, and DGLM for plant height in maize. 
+
+10.) ROC-curve-script.R : This script was used to create ROC curves.

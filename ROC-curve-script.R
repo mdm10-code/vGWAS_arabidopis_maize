@@ -26,75 +26,7 @@ library(pROC)
 #vQTN.info: This is the simulated vQTN information with physical window boundaries
 #trait.name: The setting name that you are analysing
 
-generate_ROC <- function(repsel = NULL, randvec = NULL, BFT.path.root = NULL, DGLM.path.root = NULL, BFT.fold.nam = NULL, DGLM.fold.nam = NULL, vQTN.info = NULL, trait.name = NULL) {
-  if (is.null(repsel) == F) { #This if statement is for either randomly selecting replications or inputting previous reps
-    randreps <- randvec
-  } else {
-    randreps <- sample(1:100, size = 10, replace = F)
-    print(randreps)
-  }
-  AUC.mat <- matrix(NA, nrow = 10, ncol = 5)
-  colnames(AUC.mat) <- c("randnumber", "BFT.file", "DGLM.file", "BFT.AUC", "DGLM.AUC")
-  print(randreps)
-  sim.snp <- vQTN.info$snp
-  print(sim.snp)
-  BFT.res.fold <- paste0(BFT.path.root, BFT.fold.nam, "/")
-  DGLM.res.fold <- paste0(DGLM.path.root, DGLM.fold.nam, "/")
-  print(DGLM.res.fold)
-  BFT.files <- list.files(BFT.res.fold)
-  DGLM.files <- list.files(DGLM.res.fold)
-  for (i in 1:length(randreps)) { #This for loop is required to iterate through the files
-    print(randreps[i])
-    randrep <- randreps[i]
-    AUC.mat[i, 1] <- randrep
-    print(paste0(BFT.res.fold, BFT.files[c(randrep)]))
-    AUC.mat[i, 2] <- BFT.files[c(randrep)]
-    BFT.results <- read.csv(paste0(BFT.res.fold, BFT.files[c(randrep)]), sep = ",")
-    remQTN <- grep(TRUE, BFT.results$snp == sim.snp)
-    BFT.results <- BFT.results[-c(remQTN), ]
-    print(paste0(DGLM.res.fold, DGLM.files[c(randrep)]))
-    AUC.mat[i, 3] <- DGLM.files[c(randrep)]
-    DGLM.results <- read.csv(paste0(DGLM.res.fold, DGLM.files[c(randrep)]), sep = ",")
-    
-    remQTNII <- grep(TRUE, DGLM.results$Map_info.snp == sim.snp)
-    DGLM.results <- DGLM.results[-c(remQTNII), ]
-    
-    BFT.results$class <- 0
-    DGLM.results$class <- 0
-    BFT.trueQTN <- BFT.results[BFT.results$chr == vQTN.info$chr, ]
-    BFT.trueQTN <- BFT.trueQTN[BFT.trueQTN$pos >= as.numeric(vQTN.info$QTNwindow_lowerbound), ]
-    BFT.trueQTN <- BFT.trueQTN[BFT.trueQTN$pos <= as.numeric(vQTN.info$QTNwindow_upperbound), ]
-    BFT.trueQTN$class <- 1
-    id <- grep(TRUE, BFT.results$snp %in% BFT.trueQTN$snp)
-    BFT.results[c(id), ] <- BFT.trueQTN
-    
-    DGLM.trueQTN <- DGLM.results[DGLM.results$Map_info.chr == vQTN.info$chr, ]
-    DGLM.trueQTN <- DGLM.trueQTN[DGLM.trueQTN$Map_info.pos >= as.numeric(vQTN.info$QTNwindow_lowerbound), ]
-    DGLM.trueQTN <- DGLM.trueQTN[DGLM.trueQTN$Map_info.pos <= as.numeric(vQTN.info$QTNwindow_upperbound), ]
-    print(dim(DGLM.trueQTN))
-    
-    DGLM.trueQTN$class <- 1
-    id <- grep(TRUE, DGLM.results$Map_info.snp %in% DGLM.trueQTN$Map_info.snp)
-    DGLM.results[c(id), ] <- DGLM.trueQTN
-    
-    BFT.glm.fit <- glm(BFT.results$class ~ BFT.results$p.value, family = binomial)
-    BFT.ROC <- roc(BFT.results$class, BFT.glm.fit$fitted.values, plot = T, legacy.axes = T, percent = T, xlab = "False Positive Percentage", ylab = "True Postive Percentage")
-    AUC.mat[i, 4] <- BFT.ROC$auc
-    
-    DGLM.glm.fit <- glm(DGLM.results$class ~ DGLM.results$P.disp, family = binomial)
-    DGLM.ROC <- roc(DGLM.results$class, DGLM.glm.fit$fitted.values, plot = T, legacy.axes = T, percent = T, xlab = "False Positive Percentage", ylab = "True Postive Percentage")
-    AUC.mat[i, 5] <- DGLM.ROC$auc
- #   tiff(file = paste0(randrep, "_", trait.name, ".tiff"),
-#         width = 800, height = 400, res = 100)
-#      par(pty = "s")
-#      roc(BFT.results$class, BFT.glm.fit$fitted.values, plot = T, legacy.axes = T, percent = T, xlab = "False Positive %", ylab = "True Postive %", col = "#377eb8", lwd = 2, print.auc = T, print.auc.x = 45)
-#      plot.roc(DGLM.results$class, DGLM.glm.fit$fitted.values, percent = T, col = "#4daf4a", lwd = 2, print.auc = T, add = T, print.auc.y = 35)
-#    dev.off()
-  }
-  write.csv(AUC.mat, paste0(trait.name, ".", "AUC.mat.test.csv"), row.names = F)
-}
 
-####Rerun with GAPIT
 generate_ROC <- function(repsel = NULL, randvec = NULL, BFT.path.root = NULL, DGLM.path.root = NULL, MLM.path.root = NULL, BFT.fold.nam = NULL, DGLM.fold.nam = NULL, MLM.fold.nam = NULL, vQTN.info = NULL, trait.name = NULL) {
   if (is.null(repsel) == F) { #This if statement is for either randomly selecting replications or inputting previous reps
     randreps <- randvec
@@ -102,18 +34,14 @@ generate_ROC <- function(repsel = NULL, randvec = NULL, BFT.path.root = NULL, DG
     randreps <- sample(1:100, size = 10, replace = F)
     print(randreps)
   }
-#  AUC.mat <- matrix(NA, nrow = 10, ncol = 7)
-#  colnames(AUC.mat) <- c("randnumber", "BFT.file", "DGLM.file", "MLM.file", "BFT.AUC", "DGLM.AUC", "MLM.AUC")
   print(randreps)
-#  sim.snp <- vQTN.info$snp
-#  print(sim.snp)
   BFT.res.fold <- paste0(BFT.path.root, BFT.fold.nam, "/")
   DGLM.res.fold <- paste0(DGLM.path.root, DGLM.fold.nam, "/")
   MLM.res.fold <- paste0(MLM.path.root, MLM.fold.nam, "/")
   BFT.files <- list.files(BFT.res.fold)
   DGLM.files <- list.files(DGLM.res.fold)
   MLM.files <- list.files(MLM.res.fold)
-  for (h in 1:nrow(vQTN.info)){
+  for (h in 1:nrow(vQTN.info)) {
     print(h)
     vQTN.infoh <- vQTN.info[h, ]
     sim.snp <- vQTN.infoh$snp
@@ -196,7 +124,6 @@ generate_ROC <- function(repsel = NULL, randvec = NULL, BFT.path.root = NULL, DG
     write.csv(AUC.mat, paste0(trait.name, ".", "updated", ".", vQTN.infoh[, 2], "AUC.mat.test.csv"), row.names = F)
     
 }
- # write.csv(AUC.mat, paste0(trait.name, ".", "updated", ".", "AUC.mat.test.csv"), row.names = F)
 }
 
 #Example with Molike MAF = 0.4 vQTN = 0.90, h2 = 0.63
@@ -218,12 +145,6 @@ list.files(MLM.path.root.FULL)
 
 
 ####Maize
-######Molike MAF40 h263 vQTN90
-###500
-
-#####Redoing MAF40 vQT90 h263 for GAPIT
-
-
 #######Molike MAF10 h233 vQTN10
 ##500
 generate_ROC(repsel = NULL, randvec = NULL, BFT.path.root = BFT.path.root.500, DGLM.path.root = DGLM.path.root.500, MLM.path.root = MLM.path.root.500, BFT.fold.nam = "BFT_zm.vpheno.molike.MAF10.h233.vQTN10.500", DGLM.fold.nam = "DGLM_zm.vpheno.molike.MAF10.h233.vQTN10.500", MLM.fold.nam = "MLM.zm.vpheno.molike.MAF10.h233.vQTN10.500", vQTN.info = zm_vqgi_molike_MAF10_h233_vQTN10_500_250K, trait.name = "zm.molike.MAF10.h233.vQTN10.500")
@@ -303,7 +224,6 @@ generate_ROC(repsel = NULL, randvec = NULL, BFT.path.root = BFT.path.root.FULL, 
 ##500
 generate_ROC(repsel = NULL, randvec = NULL, BFT.path.root = BFT.path.root.500, DGLM.path.root = DGLM.path.root.500, MLM.path.root = MLM.path.root.500, BFT.fold.nam = "BFT_zm.vpheno.molike.MAF40.h263.vQTN50.500", DGLM.fold.nam = "DGLM_zm.vpheno.molike.MAF40.h263.vQTN50.500", MLM.fold.nam = "MLM.zm.vpheno.molike.MAF40.h263.vQTN50.500", vQTN.info = zm_vqgi_molike_MAF40_h263_vQTN50_500_250K, trait.name = "zm.molike.MAF40.h263.vQTN50.500")
 
-
 ##FULL
 generate_ROC(repsel = NULL, randvec = NULL, BFT.path.root = BFT.path.root.FULL, DGLM.path.root = DGLM.path.root.FULL, MLM.path.root = MLM.path.root.FULL, BFT.fold.nam = "BFT_zm.vpheno.molike.MAF40.h263.vQTN50.FULL", DGLM.fold.nam = "DGLM_zm.vpheno.molike.MAF40.h263.vQTN50.FULL", MLM.fold.nam = "GAPIT_MLM.zm.vpheno.molike.MAF40.h263.vQTN50.FULL", vQTN.info = zm_vqgi_molike_MAF40_h263_vQTN50_full_250K, trait.name = "zm.molike.MAF40.h263.vQTN50.FULL")
 
@@ -316,8 +236,6 @@ generate_ROC(repsel = NULL, randvec = NULL, BFT.path.root = BFT.path.root.500, D
 ##FULL
 generate_ROC(repsel = NULL, randvec = NULL, BFT.path.root = BFT.path.root.FULL, DGLM.path.root = DGLM.path.root.FULL, MLM.path.root = MLM.path.root.FULL, BFT.fold.nam = "BFT_zm.vpheno.molike.MAF40.full", DGLM.fold.nam = "DGLM_zm.vPheno.molike.MAF40.full", MLM.fold.nam = "GAPIT.MLM.zm.vPheno.molike.MAF40.full", vQTN.info = zm_vqgi_molike_MAF40_h263_vQTN50_full_250K, trait.name = "zm.molike.MAF40.h263.vQTN90.FULL")
 
-
-
 #####Epistasis lowh2
 ##500
 generate_ROC(repsel = NULL, randvec = NULL, BFT.path.root = BFT.path.root.500, DGLM.path.root = DGLM.path.root.500, MLM.path.root = MLM.path.root.500, BFT.fold.nam = "BFT_zm.sp.epi.higheffectsize.h230.500", DGLM.fold.nam = "DGLM_zm.sp.epi.higheffectsize.h230.500", MLM.fold.nam = "MLM.zm.epistasis.higheffectsize.h230.500", vQTN.info = zm_eqgi_epistasis_lowh2_500_250K, trait.name = "zm.epistasis.lowh2.500")
@@ -329,13 +247,6 @@ generate_ROC(repsel = NULL, randvec = NULL, BFT.path.root = BFT.path.root.FULL, 
 ##500
 generate_ROC(repsel = NULL, randvec = NULL, BFT.path.root = BFT.path.root.500, DGLM.path.root = DGLM.path.root.500, MLM.path.root = MLM.path.root.500, BFT.fold.nam = "BFT_zm.sp.epi.higheffectsize.500", DGLM.fold.nam = "DGLM_zm.sp.epi.higheffectsize.500", MLM.fold.nam = "MLM.zm.sp.epi.higheffectsize.h280.500", vQTN.info = zm_eqgi_epistasis_highh2_500_250K, trait.name = "zm.epistasis.highh2.500")
 
-###
-spaceout <- c(83, 86, 88, 78, 23, 62, 61, 42, 33, 94)
-zm_eqgi_epistasis_highh2_500_spaceout_250K <- zm_eqgi_epistasis_highh2_500_250K[5:6, ]
-
-generate_ROC(repsel = TRUE, randvec = spaceout, BFT.path.root = BFT.path.root.500, DGLM.path.root = DGLM.path.root.500, MLM.path.root = MLM.path.root.500, BFT.fold.nam = "BFT_zm.sp.epi.higheffectsize.500", DGLM.fold.nam = "DGLM_zm.sp.epi.higheffectsize.500", MLM.fold.nam = "MLM.zm.sp.epi.higheffectsize.h280.500", vQTN.info = zm_eqgi_epistasis_highh2_500_spaceout_250K, trait.name = "zm.epistasis.highh2.500")
-
-
 ##FULL
 generate_ROC(repsel = NULL, randvec = NULL, BFT.path.root = BFT.path.root.FULL, DGLM.path.root = DGLM.path.root.FULL, MLM.path.root = MLM.path.root.FULL, BFT.fold.nam = "BFT_zm.sp.epi.higheffectsize.full.h280", DGLM.fold.nam = "DGLM_zm.sp.epi.h280.FULL", MLM.fold.nam = "GAPIT.MLM.zm.sp.epi.higheffectsize.full.h280", vQTN.info = zm_eqgi_epistasis_highh2_FULL_250K, trait.name = "zm.epistasis.highh2.FULL")
 
@@ -346,11 +257,10 @@ generate_ROC(repsel = NULL, randvec = NULL, BFT.path.root = BFT.path.root.500, D
 ##FULL
 generate_ROC(repsel = NULL, randvec = NULL, BFT.path.root = BFT.path.root.FULL, DGLM.path.root = DGLM.path.root.FULL, MLM.path.root = MLM.path.root.FULL, BFT.fold.nam = "BFT_sp.zm.GxE.FULL.mod", DGLM.fold.nam = "DGLM_sp.zm.GxE.FULL.mod", MLM.fold.nam = "MLM.zm.GxE.FULL", vQTN.info = zm_gxeqgi_diff_FULL_250K, trait.name = "zm.GxE.FULL")
 
-
-#####################
+###################################################################
 #This next section is for Arabidopsis
 
-  ##FULL
+##Define the root paths
 at.BFT.path.root <- "C:/Users/mdm10/Documents/Ph.D._Dissertation/Projects/Dissertation_research/C1/2_pipeline/out/vGWAS_chapter_one_at/vGWAS_results/BF/Revisions/"
 at.DGLM.path.root <- "C:/Users/mdm10/Documents/Ph.D._Dissertation/Projects/Dissertation_research/C1/2_pipeline/out/vGWAS_chapter_one_at/vGWAS_results/DGLM/Revisions/"
 at.MLM.path.root <- "C:/Users/mdm10/Documents/Ph.D._Dissertation/Projects/Dissertation_research/C1/2_pipeline/out/vGWAS_chapter_one_at/vGWAS_results/GAPIT/At/"
@@ -419,7 +329,6 @@ generate_ROC(repsel = NULL, randvec = NULL, BFT.path.root = at.BFT.path.root, DG
 
 ##FULL
 generate_ROC(repsel = NULL, randvec = NULL, BFT.path.root = at.BFT.path.root, DGLM.path.root = at.DGLM.path.root, MLM.path.root = at.MLM.path.root, BFT.fold.nam = "Molike_MAF40_h233_vQTN90/FULL", DGLM.fold.nam = "Molike_MAF40_h233_vQTN90/FULL", MLM.fold.nam = "Molike_MAF40_h233_vQTN90/FULL", vQTN.info = at_vqgi_molike_wmQTL_MAF40_h233_vQTN90_full, trait.name = "at.molike.MAF40.h233.vQTN90.FULL")
-rate_ROC(repsel = NULL, randvec = NULL, BFT.path.root = at.BFT.path.root, DGLM.path.root = at.DGLM.path.root, MLM.path.root = at.MLM.path.root, BFT.fold.nam = "Molike_MAF40_h233_vQTN50/FULL", DGLM.fold.nam = "Molike_MAF40_h233_vQTN50/FULL", MLM.fold.nam = "Molike_MAF40_h233_vQTN50/FULL", vQTN.info = at_vqgi_molike_wmQTL_MAF40_h233_vQTN50_full, trait.name = "at.molike.MAF40.h233.vQTN50.FULL")
 
 #######Molike MAF40 h263 vQTN10
 ##500
@@ -462,8 +371,6 @@ generate_ROC(repsel = NULL, randvec = NULL, BFT.path.root = at.BFT.path.root, DG
 
 ##FULL
 generate_ROC(repsel = NULL, randvec = NULL, BFT.path.root = at.BFT.path.root, DGLM.path.root = at.DGLM.path.root, MLM.path.root = at.MLM.path.root, BFT.fold.nam = "GxE_diff/FULL", DGLM.fold.nam = "GxE_diff/FULL", MLM.fold.nam = "GxE_diff/FULL", vQTN.info = at_gxeqgi_diff_FULL_100K, trait.name = "at.GxE.FULL")
-
-
 
 ##################################
 save.image("~/vGWAS_chaptI_RII.RData")

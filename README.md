@@ -1,5 +1,5 @@
 # vGWAS_arabidopis_maize
-This is the repository for "Simulation study evaluating the ability of two statistical approaches to identify variance quantitative trait loci Arabidopsis and maize" 
+This is the repository for "Assessment of two statistical approaches for variance genome-wide association studies in plants" 
 
 The following is an outline/order of the scripts used for this publication with a description of each file.
 

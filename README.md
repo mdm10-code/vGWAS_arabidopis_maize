@@ -1,24 +1,10 @@
 # vGWAS_arabidopis_maize
 This is the repository for "Assessment of two statistical approaches for variance genome-wide association studies in plants" 
 
-The following is an outline/order of the scripts used for this publication with a description of each file.
+The following is an explanation for each of the folders:
 
-1.) additive-effects-simplePHENOTYPES-script.R : This script was used to produce the null settings, epistasis, GxE, and additive effects for the Molydenum-like settings with additive effects
+1.) scripts: The R scripts used for this study.
 
-2.) vGWAS-vQTL-simulation-code-script.R : This script was used to simulate the variance genetic architectures for the Molydenum-like settings
+2.) Supplemental-Files: The supplemental materials included with the manuscript
 
-3.) vGWAS-Brown Forsythe Test Script.R : This script was used to run the Brown-Forsythe Test (BFT) on the different settings
-
-4.) GAPIT-script.R : This script used GAPIT to run the Unified Linear Mixed Model (MLM)
-
-5.) DGLM-script.R : This script was used to run DGLM on the different settings
-
-6.) Positive-detection-rate-script.R : This script was used to process the false and true-positive detection rates of all the settings
-
-7.) vGWAS-visualization-script.R : This script was used to visualize the false and true-positive detection rates
-
-8.) Applied-vGWAS-script.R : This script was used to conduct BFT and DGLM on plant height residuals in maize
-
-9.) Applied-vGWAS-Visuals-Script.R : This script was used to visualize the results from MLM, BFT, and DGLM for plant height in maize. 
-
-10.) ROC-curve-script.R : This script was used to create ROC curves.
+3.) Output: The results files generated to obtain the tables and figures within the manuscript

@@ -5,6 +5,7 @@ The following is an explanation for each of the folders:
 
 1.) Data: This folder contains the genotypic data used for this study. The external folder refers to the genotypic datasets that are publically accessible while the internal refers to these publically available datasets filtered for this study. 
 *Note: The original Arabidopsis genotypic dataset is too large to have on this repository. This is available upon request.
+*Note: The LD pruned bed file for maize is too large to be on this repository. This is available upon request. 
 
 2.) Scripts: The R scripts used for this study.
 

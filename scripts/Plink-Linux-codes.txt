@@ -1,0 +1,4 @@
+
+######################
+./plink2.exe --bfile  out_geno --indep-pairwise 100 25 0.2 --maf 0.05 --mind 0.10 --make-bed --out ames2815_r220
+./plink2.exe --bfile  ames2815_r220 --extract ames2815_r220.prune.in --make-bed --out ames2815_r220_100_25

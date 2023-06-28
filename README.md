@@ -9,6 +9,6 @@ The following is an explanation for each of the folders:
 
 2.) Scripts: The R scripts used for this study.
 
-3.) Supplemental-Files: The supplemental materials included with the manuscript
+3.) Supplemental Files: The supplemental materials included with the manuscript
 
-4.) Output: The results files generated to obtain the tables and figures within the manuscript
+4.) Output: The results files generated to obtain the tables and figures within the manuscript. *Note, The result files for each test and rep are too large to store on this repository. These files are available upon request.  
